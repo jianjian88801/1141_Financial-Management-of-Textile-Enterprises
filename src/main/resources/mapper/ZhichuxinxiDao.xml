@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhichuxinxiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.zhichuxinxi_mingmu_name as zhichuxinxiMingmuName
+        ,a.zhichuxinxi_types as zhichuxinxiTypes
+        ,a.zhichuxinxi_money as zhichuxinxiMoney
+        ,a.zhichu_content as zhichuContent
+        ,a.zhichuxinxi_time as zhichuxinxiTime
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhichuxinxiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM zhichuxinxi  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.zhichuxinxiMingmuName != '' and params.zhichuxinxiMingmuName != null and params.zhichuxinxiMingmuName != 'null' ">
+                and a.zhichuxinxi_mingmu_name like CONCAT('%',#{params.zhichuxinxiMingmuName},'%')
+            </if>
+            <if test="params.zhichuxinxiTypes != null and params.zhichuxinxiTypes != ''">
+                and a.zhichuxinxi_types = #{params.zhichuxinxiTypes}
+            </if>
+            <if test="params.zhichuxinxiMoneyStart != null ">
+                <![CDATA[  and a.zhichuxinxi_money >= #{params.zhichuxinxiMoneyStart}   ]]>
+            </if>
+            <if test="params.zhichuxinxiMoneyEnd != null ">
+                <![CDATA[  and a.zhichuxinxi_money <= #{params.zhichuxinxiMoneyEnd}   ]]>
+            </if>
+            <if test=" params.zhichuContent != '' and params.zhichuContent != null and params.zhichuContent != 'null' ">
+                and a.zhichu_content like CONCAT('%',#{params.zhichuContent},'%')
+            </if>
+            <if test=" params.zhichuxinxiTimeStart != '' and params.zhichuxinxiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhichuxinxi_time) >= UNIX_TIMESTAMP(#{params.zhichuxinxiTimeStart}) ]]>
+            </if>
+            <if test=" params.zhichuxinxiTimeEnd != '' and params.zhichuxinxiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhichuxinxi_time) <= UNIX_TIMESTAMP(#{params.zhichuxinxiTimeEnd}) ]]>
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
